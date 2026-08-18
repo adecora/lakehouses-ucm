@@ -1,7 +1,7 @@
 [project]
-name = "lakehouses_ucm"
+name = "motor_ingesta"
 version = "0.0.1"
-authors = [{ name = "alvare05@ucm.es" }]
+authors = [ { name = "Alejandro de Cora", email = "alejandrodecora@gmail.com" } ]
 requires-python = ">=3.10,<3.13"
 dependencies = [
     # Any dependencies for jobs and pipelines in this project can be added here
@@ -21,7 +21,7 @@ dev = [
 ]
 
 [project.scripts]
-main = "lakehouses_ucm.main:main"
+main = "motor_ingesta.main:main"
 
 [build-system]
 requires = ["hatchling"]

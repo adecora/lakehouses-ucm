@@ -29,7 +29,7 @@ resources:
           depends_on:
             - task_key: notebook_task
           python_wheel_task:
-            package_name: lakehouses_ucm
+            package_name: motor_ingesta
             entry_point: main
             parameters:
               - "--catalog"

@@ -1,6 +1,7 @@
 from databricks.sdk.runtime import spark
 from pyspark.sql import DataFrame
-from lakehouses_ucm import taxis
+
+from motor_ingesta import taxis
 
 
 def test_find_all_taxis():
