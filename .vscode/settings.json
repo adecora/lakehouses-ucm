@@ -36,4 +36,10 @@
         "editor.defaultFormatter": "charliermarsh.ruff",
         "editor.formatOnSave": true,
     },
+
+    // General settings
+    "[json]": {
+      "editor.insertSpaces": true,
+      "editor.tabSize": 2
+    }
 }
