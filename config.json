@@ -10,7 +10,10 @@
         },
         "sink": {
             "name": "events_raw",
-            "execution": "{'availableNow': True}"
+            "trigger": {
+                "type": "availableNow",
+                "value": "True"
+            }
         }
     },
     {
@@ -24,7 +27,10 @@
         },
         "sink": {
             "name": "orders_raw",
-            "execution": "{'once': True}"
+            "trigger": {
+                "type": "once",
+                "value": "True"
+            }
         }
     }
 ]

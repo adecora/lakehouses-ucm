@@ -1,6 +1,6 @@
-from typing import Any, Literal
+from typing import Annotated, Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, computed_field, model_validator
 
 
 class BaseConfig(BaseModel):
@@ -59,6 +59,43 @@ class FileSourceConfig(BaseConfig):
         return self
 
 
+class BoolTrigger(BaseConfig):
+    type: Literal["once", "availableNow"]
+    value: bool
+
+
+class StrTrigger(BaseConfig):
+    type: Literal["processingTime", "continuous", "realTime"]
+    value: str
+
+
+Trigger = Annotated[BoolTrigger | StrTrigger, Field(discriminator="type")]
+
+
+class SinkConfig(BaseConfig):
+    """
+    Esquema para el volcado de datos
+    """
+
+    name: str
+    trigger: Trigger | None = None
+
+    @computed_field
+    @property
+    def trigger_config(self) -> str | None:
+        if self.trigger is None:
+            return None
+
+        return {self.trigger.type: self.trigger.value}
+
+
+class IngestConfig(BaseConfig):
+    source: FileSourceConfig
+    sink: SinkConfig
+
+
+__all__ = ["IngestConfig"]
+
 if __name__ == "__main__":
     import json
     from pathlib import Path
@@ -68,5 +105,9 @@ if __name__ == "__main__":
         tables = json.load(f)
 
     for t in tables:
-        source = t.get("source")
-        print(FileSourceConfig.model_validate(source), end="\n\n")
+        so = t.get("source")
+        si = t.get("sink")
+
+        print(IngestConfig.model_validate(t), end="\n\n")
+
+    print(IngestConfig.model_validate_json((pwd.parents[1] / "config.json").read_text()))
