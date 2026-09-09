@@ -12,6 +12,10 @@ dependencies = [
     "pydantic >=2.10.6,<2.11.dev0",
 ]
 
+[project.urls]
+Homepage = "https://github.com/adecora"
+Personal = "https://alejandrodecora.es"
+
 [dependency-groups]
 dev = [
     "pytest",

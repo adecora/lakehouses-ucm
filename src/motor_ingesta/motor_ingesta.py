@@ -91,12 +91,11 @@ class MotorIngesta:
         if sink.trigger is not None:
             trigger = sink.trigger_config
 
+        writer = df.writeStream.option("queryName", table_name).option(
+            "checkpointLocation", f"{self.checkpoints_location}/{table_name}"
+        )
         if self.tables_location:
-            spark.sql(f"""CREATE TABLE IF NOT EXISTS {table_name}
-                        USING DELTA
-                        LOCATION '{self.tables_location}/{table_name}'
-                    """)
-        writer = df.writeStream.option("checkpointLocation", f"{self.checkpoints_location}/{table_name}")
+            writer = writer.option("path", f"{self.tables_location}/{table_name}")
 
         if trigger is not None:
             writer = writer.trigger(**trigger)
