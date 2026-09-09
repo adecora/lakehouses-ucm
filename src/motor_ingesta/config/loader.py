@@ -9,7 +9,8 @@ from .templates import IngestConfig
 
 class ConfigLoader:
     """
-    Loader para consumir los ficheros de configuración para la ingesta
+    Loader de configuración para la ingesta de datos desde landing a bronze.
+    Permite cargar la configuración desde un diccionario, una lista de diccionarios o un archivo JSON.
     """
 
     _list_ingestion = TypeAdapter(list[IngestConfig])
@@ -42,11 +43,14 @@ class ConfigLoader:
         raise TypeError(f"Tipo de configuración no soportado: {type(data).__name__}")
 
 
+# Clases que se importan con "from loader import *"
 __all__ = ["ConfigLoader"]
 
 if __name__ == "__main__":
     import json
     from pathlib import Path
+
+    dir = Path(__file__).parents[3] / "config.json"
 
     tables = json.loads(dir.read_text())
 

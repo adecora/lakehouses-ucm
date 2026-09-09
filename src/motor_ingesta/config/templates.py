@@ -5,12 +5,14 @@ from pydantic import BaseModel, ConfigDict, Field, computed_field, model_validat
 
 class BaseConfig(BaseModel):
     """
-    Set de la configuración para no permitir argumentos extra
+    Configuración base para las clases de configuración de ingesta.
+    Impide que se pasen parámetros adicionales no definidos en el modelo y habilita la validación por nombre y alias.
     """
 
     model_config = ConfigDict(extra="forbid", validate_by_name=True, validate_by_alias=True)
 
 
+# Formatos soportados por la ingesta de archivos
 FileFormat = Literal[
     "csv",
     "json",
@@ -19,6 +21,7 @@ FileFormat = Literal[
     "binaryFile",
 ]
 
+# Modos de evolución de esquema soportados por la ingesta de archivos
 SchemaEvolutionMode = Literal[
     "addNewColumns",
     "addNewColumnsWithTypeWidening",
@@ -30,7 +33,8 @@ SchemaEvolutionMode = Literal[
 
 class FileSourceConfig(BaseConfig):
     """
-    Esquema para la ingesta de ficheros
+    Esquema para la configuración de la ingesta de archivos desde landing a bronze.
+    Permite definir el formato de los archivos, las opciones de lectura, el esquema y la ubicación de los archivos en landing.
     """
 
     format: FileFormat
@@ -42,12 +46,15 @@ class FileSourceConfig(BaseConfig):
     schema_: str | None = Field(default=None, alias="schema")
     schema_hints: str | None = Field(default=None, alias="schemaHints")
     schema_evolution_mode: SchemaEvolutionMode | None = Field(default=None, alias="schemaEvolutionMode")
-    schema_location: str | None = Field(default=None, alias="schemaLocation")
+    schema_location: bool = Field(default=False, alias="schemaLocation")
 
     path: str | None
 
     @model_validator(mode="after")
     def validate_schema(self):
+        """
+        Valida que no se pasen parámetros incompatibles entre sí en la configuración de ingesta de archivos.
+        """
         if self.schema_ and (self.schema_hints or self.schema_location):
             if self.schema_hints and self.schema_location:
                 raise ValueError("'schema' no es compatible con 'schema_hints' y 'schema_location'")
@@ -58,7 +65,31 @@ class FileSourceConfig(BaseConfig):
 
         return self
 
+    @computed_field
+    @property
+    def get_options(self) -> str | None:
+        """
+        Construye un diccionario con todas las opciones de lectura de archivos.
+        """
+        if self.schema_evolution_mode or self.schema_hints:
+            return self.options
 
+        options = {**self.options}
+
+        if self.schema_evolution_mode:
+            options.update({"cloudFiles.schemaEvolutionMode": self.schema_evolution_mode})
+        if self.schema_location:
+            options.update({"cloudFiles.schemaHints": self.schema_hints})
+
+        return options
+
+
+# Atajo para definir los triggers de escritura en el sink de bronze desde el archivo de configuración
+# Se define con un diccionario con la clave "type" y el valor del tipo de trigger "value"
+# "trigger": {
+#     "type": "once",
+#     "value": "True"
+# }
 class BoolTrigger(BaseConfig):
     type: Literal["once", "availableNow"]
     value: bool
@@ -74,7 +105,8 @@ Trigger = Annotated[BoolTrigger | StrTrigger, Field(discriminator="type")]
 
 class SinkConfig(BaseConfig):
     """
-    Esquema para el volcado de datos
+    Esquema para la configuración del sink de bronze.
+    Permite definir el nombre de la tabla de bronze y el trigger de escritura.
     """
 
     name: str
@@ -83,6 +115,9 @@ class SinkConfig(BaseConfig):
     @computed_field
     @property
     def trigger_config(self) -> str | None:
+        """
+        Construye un diccionario con la configuración del trigger de escritura tal como la consume spark.
+        """
         if self.trigger is None:
             return None
 
@@ -94,20 +129,22 @@ class IngestConfig(BaseConfig):
     sink: SinkConfig
 
 
+# Clases que se importan con "from templates import *"
 __all__ = ["IngestConfig"]
 
 if __name__ == "__main__":
     import json
     from pathlib import Path
 
-    pwd = Path.cwd()
-    with (pwd.parents[1] / "config.json").open("r") as f:
+    dir = Path(__file__).parents[3] / "config.json"
+    with dir.open("r") as f:
         tables = json.load(f)
 
     for t in tables:
         so = t.get("source")
         si = t.get("sink")
 
-        print(IngestConfig.model_validate(t), end="\n\n")
+        i = IngestConfig.model_validate(t)
+        print(i, end="\n\n")
 
-    print(IngestConfig.model_validate_json((pwd.parents[1] / "config.json").read_text()))
+    print(IngestConfig.model_validate_json(dir.read_text()))

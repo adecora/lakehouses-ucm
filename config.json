@@ -4,7 +4,7 @@
             "format": "json",
             "options": {
             },
-            "schema": "event_id string, event_ts datetime, session_id string, customer_id string, event_type string, product_id string, channel string",
+            "schema": "event_id string, event_ts string, session_id string, customer_id string, event_type string, product_id string, channel string",
             "schemaEvolutionMode": "rescue",
             "path": "app_events_??.json"
         },
@@ -21,9 +21,9 @@
             "format": "json",
             "options": {
             },
-            "schema_location": "orders_cdc_??.json",
+            "schema_location": "True",
             "schemaEvolutionMode": "addNewColumns",
-            "path": "orders_cdc_%%.json"
+            "path": "orders_cdc_??.json"
         },
         "sink": {
             "name": "orders_raw",
