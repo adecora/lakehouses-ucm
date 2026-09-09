@@ -45,23 +45,3 @@ class ConfigLoader:
 
 # Clases que se importan con "from loader import *"
 __all__ = ["ConfigLoader"]
-
-if __name__ == "__main__":
-    import json
-    from pathlib import Path
-
-    dir = Path(__file__).parents[3] / "config.json"
-
-    tables = json.loads(dir.read_text())
-
-    for t in tables:
-        print(t, end="\n\n")
-        print(ConfigLoader.from_dict(t))
-
-    print("\n=================================\n")
-
-    print(ConfigLoader.from_list(tables))
-
-    print("\n=================================\n")
-
-    print(ConfigLoader.from_file(dir))

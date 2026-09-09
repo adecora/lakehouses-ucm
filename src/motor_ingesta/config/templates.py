@@ -9,7 +9,7 @@ class BaseConfig(BaseModel):
     Impide que se pasen parámetros adicionales no definidos en el modelo y habilita la validación por nombre y alias.
     """
 
-    model_config = ConfigDict(extra="forbid", validate_by_name=True, validate_by_alias=True)
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
 
 
 # Formatos soportados por la ingesta de archivos
@@ -131,20 +131,3 @@ class IngestConfig(BaseConfig):
 
 # Clases que se importan con "from templates import *"
 __all__ = ["IngestConfig"]
-
-if __name__ == "__main__":
-    import json
-    from pathlib import Path
-
-    dir = Path(__file__).parents[3] / "config.json"
-    with dir.open("r") as f:
-        tables = json.load(f)
-
-    for t in tables:
-        so = t.get("source")
-        si = t.get("sink")
-
-        i = IngestConfig.model_validate(t)
-        print(i, end="\n\n")
-
-    print(IngestConfig.model_validate_json(dir.read_text()))
