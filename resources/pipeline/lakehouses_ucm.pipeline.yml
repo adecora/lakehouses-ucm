@@ -1,0 +1,14 @@
+# Configuración del pipeline que genera las tablas en silver y en bronze
+resources:
+  pipelines:
+    lakehouses_ucm_etl:
+      name: lakehouses_ucm_etl
+      catalog: ${var.catalog}
+      schema: ${var.schema}
+      # photon: true
+      serverless: true
+      root_path: "../../src/lakehouses_ucm_etl"
+
+      libraries:
+        - glob:
+            include: ../../src/lakehouses_ucm_etl/transformations/**

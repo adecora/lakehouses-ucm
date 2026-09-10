@@ -26,7 +26,7 @@ def main():
     parser.add_argument("--config", required=True, help="Ruta del archivo de configuración de ingesta (JSON)")
     args = parser.parse_args()
 
-    config = ConfigLoader(args.config)
+    config = ConfigLoader.from_file(args.config)
 
     motor_ingesta = MotorIngesta(
         catalog=args.catalog, schema=args.schema, landing=args.landing, meta=args.meta, location=args.location
@@ -51,3 +51,18 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+[
+    "--catalog",
+    "adbmade01alvare05",
+    "--schema",
+    "farmia_bronze",
+    "--landing",
+    "/Volumes/adbmade01alvare05/farmia_bronze/landing/staging",
+    "--meta",
+    "/Volumes/adbmade01alvare05/farmia_bronze/_meta",
+    "--location",
+    "abfss://lakehouse@masteravdc001sta.dfs.core.windows.net/farmia/bronze",
+    "--config",
+    "/Workspace/Users/alvare05@ucm.es/.bundle/lakehouses_ucm/dev/files/config.json",
+]

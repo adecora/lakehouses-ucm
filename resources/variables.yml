@@ -1,0 +1,25 @@
+variables:
+  number_of_files:
+    description: Número de archivos a procesar en cada ingesta
+    default: "1"
+  catalog:
+    description: Nombre del catálogo
+    default: adbmade01alvare05
+  schema:
+    description: Nombre del esquema
+    default: farmia_bronze
+  schema_prefix:
+    description: Filtro para los esquemas de farmia
+    default: farmia_%
+  landing_dir:
+    description: Ruta de landing donde se encuentran los archivos a ingerir
+    default: /Volumes/adbmade01alvare05/farmia_bronze/landing/staging
+  meta_dir:
+    description: Ruta donde se almacenan los metadatos de ingesta
+    default: /Volumes/adbmade01alvare05/farmia_bronze/_meta
+  location_dir:
+    description: Ruta en caso que se requira almacenar las tablas como tablas externas
+    default: abfss://lakehouse@masteravdc001sta.dfs.core.windows.net/farmia/bronze
+  config_dir:
+    description: Ruta del archivo de configuración de ingesta (JSON)
+    default: ../config.json

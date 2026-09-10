@@ -18,12 +18,12 @@
     },
     {
         "source": {
-            "format": "json",
+            "format": "parquet",
             "options": {
             },
             "schema_location": "True",
             "schemaEvolutionMode": "addNewColumns",
-            "path": "orders_cdc_??.json"
+            "path": "orders_cdc_??.parquet"
         },
         "sink": {
             "name": "orders_raw",

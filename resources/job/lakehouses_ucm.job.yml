@@ -1,0 +1,70 @@
+resources:
+  jobs:
+    lakehouses_ucm:
+      name: lakehouses_ucm
+
+      # Omitimos la configuración del trigger periódico
+      # trigger:
+      #   periodic:
+      #     interval: 1
+      #     unit: DAYS
+
+      tasks:
+        - task_key: cargar_nuevos_datos
+          notebook_task:
+            notebook_path: ../../src/land_new_data.ipynb
+            base_parameters:
+              number_of_files: ${var.number_of_files}
+
+        - task_key: ingesta_bronze
+          depends_on:
+            - task_key: cargar_nuevos_datos
+          python_wheel_task:
+            package_name: motor_ingesta
+            entry_point: main
+            parameters:
+              - --catalog
+              - "${var.catalog}"
+              - --schema
+              - "${var.schema}"
+              - --landing
+              - "${var.landing_dir}"
+              - --meta
+              - "${var.meta_dir}"
+              - --location
+              - "${var.location_dir}"
+              - --config
+              - "${var.config_dir}"
+          environment_key: default
+
+        - task_key: etl_pipeline
+          depends_on:
+            - task_key: ingesta_bronze
+          pipeline_task:
+            pipeline_id:  ${resources.pipelines.lakehouses_ucm_etl.id}
+
+        - task_key: resumen_pipeline
+          depends_on:
+            - task_key: etl_pipeline
+          notebook_task:
+            notebook_path: ../../src/resume_pipeline.ipynb
+          email_notifications:
+            on_success:
+              - alvare05@ucm.es
+
+      tags:
+        owner: adecora
+        project: lakehouses-ucm
+
+      parameters:
+        - name: catalog
+          default: ${var.catalog}
+        - name: schema_prefix
+          default: ${var.schema_prefix}
+
+      environments:
+        - environment_key: default
+          spec:
+            environment_version: "5"
+            dependencies:
+              - ../../dist/*.whl

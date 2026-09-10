@@ -7,7 +7,7 @@ from .config import IngestConfig, ConfigLoader
 from .motor_ingesta import MotorIngesta
 
 __version__ = importlib.metadata.version("motor_ingesta")
-__author__ = importlib.metadata.metadata("motor_ingesta")["Author"]
+__author__ = importlib.metadata.metadata("motor_ingesta")["Author-email"]
 
 __all__ = ["MotorIngesta", "IngestConfig", "ConfigLoader"]
 
