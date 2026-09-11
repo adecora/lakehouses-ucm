@@ -1,0 +1,58 @@
+[
+    {
+        "source": {
+            "format": "event-hubs",
+            "messages": "json",
+            "options": {
+                "includeHeaders" : "true",
+                "startingOffsets": "earliest"
+            },
+            "connection": {
+                "bootstrap_servers": "mde-lakehouses.servicebus.windows.net:9093",
+                "security_protocol": "SASL_SSL",
+                "sasl_mechanism": "PLAIN",
+                "password": {
+                    "scope": "lakehouses-ucm",
+                    "key": "connection-string"
+                }
+            },
+            "schema": "event_id string, event_ts string, session_id string, customer_id string, event_type string, product_id string, channel string",
+            "topic": "sensors-json"
+        },
+        "sink": {
+            "name": "sensors_json_raw",
+            "trigger": {
+                "type": "availableNow",
+                "value": "True"
+            }
+        }
+    },
+    {
+        "source": {
+            "format": "event-hubs",
+            "messages": "avro",
+            "options": {
+                "includeHeaders" : "true",
+                "startingOffsets": "earliest"
+            },
+            "connection": {
+                "bootstrap_servers": "mde-lakehouses.servicebus.windows.net:9093",
+                "security_protocol": "SASL_SSL",
+                "sasl_mechanism": "PLAIN",
+                "password": {
+                    "scope": "lakehouses-ucm",
+                    "key": "connection-string"
+                }
+            },
+            "schema": "{\"type\":\"record\",\"name\":\"AppEvent\",\"fields\":[{\"name\":\"event_id\",\"type\":\"string\"},{\"name\":\"event_ts\",\"type\":\"string\"},{\"name\":\"session_id\",\"type\":\"string\"},{\"name\":\"customer_id\",\"type\":\"string\"},{\"name\":\"event_type\",\"type\":\"string\"},{\"name\":\"product_id\",\"type\":\"string\"},{\"name\":\"channel\",\"type\":\"string\"}]}",
+            "topic_pattern": "sensors-a.*"
+        },
+        "sink": {
+            "name": "sensors_avro_raw",
+            "trigger": {
+                "type": "once",
+                "value": "True"
+            }
+        }
+    }
+]

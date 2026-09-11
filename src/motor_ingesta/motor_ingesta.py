@@ -1,10 +1,14 @@
+import json
+from collections.abc import Callable
+
 from databricks.sdk.runtime import spark
 from pyspark.sql import DataFrame
 from pyspark.sql import functions as F
+from pyspark.sql.avro.functions import from_avro
 from pyspark.sql.streaming import StreamingQuery
 
 from .config import IngestConfig
-from .config.templates import FileSourceConfig, SinkConfig
+from .config.templates import FileSourceConfig, KafkaSourceConfig, SinkConfig
 
 
 class MotorIngesta:
@@ -13,7 +17,7 @@ class MotorIngesta:
     """
 
     _file_ingestion = ("csv", "json", "avro", "parquet", "binaryFile")
-    _stream_ingestion = ("kafka", "event_hubs")
+    _stream_ingestion = ("kafka", "event-hubs")
 
     def __init__(self, catalog: str, schema: str, landing: str, meta: str, location: str | None = None) -> None:
         """
@@ -52,6 +56,37 @@ class MotorIngesta:
 
         return df.select(*ingestion_metadata, "*")
 
+    def __parse_stream(self, source: KafkaSourceConfig) -> Callable[[DataFrame], DataFrame]:
+        """
+        Parsea los datos de un stream de Kafka, agregando metadatos de ingesta.
+        """
+
+        def parse_stream(df: DataFrame) -> DataFrame:
+            nonlocal source
+
+            if source.messages == "json":
+                parser = F.from_json
+                df = df.withColumn("value", F.col("value").cast("string"))
+            elif source.messages == "avro":
+                parser = from_avro
+
+            # Renombramos las columnas
+            columns = [F.col(c).alias(f"_{c}") for c in df.columns]
+            df = df.select(*columns)
+
+            # Si es mensaje de Kafka en formato Avro hay que fumarse los bytes que corresponden al id del schema
+            if source.format == "kafka" and source.message_format == "avro":
+                df = df.withColumn("_value", F.expr("substring(_value, 6, length(_value) - 5)"))
+
+            return (
+                df.withColumn("_ingested_at", F.current_timestamp())
+                .withColumn("v", parser(F.col("_value"), source.schema_))
+                .select("*", "v.*")
+                .drop("v")
+            )
+
+        return parse_stream
+
     def __file_ingestion(self, source: FileSourceConfig, *, table_name: str) -> DataFrame:
         """
         Ingesta de archivos desde landing a bronze.
@@ -74,6 +109,21 @@ class MotorIngesta:
             .load(f"{self.staging_location}/{source.path}")
             .transform(self.__add_bronze_file_metadata)
         )
+
+    def __stream_ingestion(self, source: KafkaSourceConfig) -> DataFrame:
+        """
+        Ingesta de datos desde Kafka a bronze.
+
+        Parámetros:
+        ===========
+        - source: Configuración de la fuente de datos a ingerir.
+        - table_name: Nombre de la tabla de bronze donde se van a almacenar los datos.
+        """
+        reader = spark.readStream.format("kafka").options(**source.get_options)
+
+        parse_stream = self.__parse_stream(source)
+
+        return reader.load().transform(parse_stream)
 
     def __write_stream(self, df: DataFrame, sink: SinkConfig, *, trigger: dict | None = None) -> StreamingQuery:
         """
@@ -118,7 +168,9 @@ class MotorIngesta:
                 queries.append(query)
 
             elif source.format in self._stream_ingestion:
-                pass
+                df = self.__stream_ingestion(source)
+                query = self.__write_stream(df, sink, trigger={"availableNow": True})
+                queries.append(query)
             else:
                 raise Exception(f'El formato "{format}" no está soportado!')
 

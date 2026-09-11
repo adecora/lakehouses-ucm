@@ -68,3 +68,46 @@ with this project. It's also possible to interact with it directly using the CLI
    ```
    $ uv run pytest
    ```
+
+
+
+```
+IngestionConfig
+│
+├── datasource
+├── dataset
+│
+├── source
+│   │
+│   ├── FileSourceConfig
+│   │   ├── format
+│   │   ├── path
+│   │   ├── schema
+│   │   ├── schema_location
+│   │   ├── schema_evolution_mode
+│   │   ├── schema_hints
+│   │   └── options
+│   │
+│   └── KafkaSourceConfig
+│       ├── connection
+│       │   ├── bootstrap_servers
+│       │   ├── security_protocol
+│       │   ├── sasl_mechanism
+│       │   ├── username
+│       │   └── password
+│       ├── subscribe / subscribe_pattern
+│       ├── key_format
+│       ├── value_format
+│       ├── key_subject
+│       ├── value_subject
+│       ├── schema
+│       ├── schema_location
+│       ├── schema_evolution_mode
+│       ├── schema_hints
+│       └── options
+│
+└── sink
+    ├── path / table
+    ├── checkpoint_location
+    └── partition_columns
+```
