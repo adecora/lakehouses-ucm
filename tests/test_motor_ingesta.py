@@ -7,9 +7,10 @@ from pyspark.sql import SparkSession
 
 from motor_ingesta import MotorIngesta
 
-# Valores por defecto del target 'dev' del bundle, ver resources/variables.yml
+# Valores por defecto del catálogo y esquema para los tests
+# Se usa el shema "default" para los tests unitarios
 CATALOG = "adbmade01alvare05"
-SCHEMA = "farmia_bronze"
+SCHEMA = "default"
 
 
 def test_motor_ingesta_sets_catalog_and_schema(spark: SparkSession):
