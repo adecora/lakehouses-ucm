@@ -28,6 +28,9 @@ jobs:
 
       - name: Run tests with coverage
         run: uv run pytest --cov=motor_ingesta --cov-report=term --cov-branch --cov-report=xml
+        env:
+          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
 
   validate:
     needs: test
