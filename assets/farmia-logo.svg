@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 160" width="100%" height="100%">
+  <!-- ========================================== -->
+  <!-- FONDO Y RED DE DATOS                       -->
+  <!-- ========================================== -->
+  <circle cx="80" cy="75" r="65" fill="#f0fdf4" stroke="#c6f6d5" stroke-width="3"/>
+
+  <!-- Nodos de conexión (Red/IoT) en el fondo -->
+  <path d="M40 50 L 60 70 L 80 45 L 110 65 L 120 40" fill="none" stroke="#bae6fd" stroke-width="2"/>
+  <circle cx="40" cy="50" r="3" fill="#38bdf8"/>
+  <circle cx="80" cy="45" r="3" fill="#38bdf8"/>
+  <circle cx="120" cy="40" r="3" fill="#38bdf8"/>
+
+  <!-- ========================================== -->
+  <!-- BASE DE DATOS (El "Sustrato")              -->
+  <!-- ========================================== -->
+  <!-- Cilindro inferior -->
+  <path d="M45 100 L 45 115 A 35 12 0 0 0 115 115 L 115 100 Z" fill="#0284c7"/>
+  <!-- Cilindro medio -->
+  <path d="M45 85 L 45 100 A 35 12 0 0 0 115 100 L 115 85 Z" fill="#0ea5e9"/>
+  <!-- Tapa superior de la base de datos -->
+  <ellipse cx="80" cy="85" rx="35" ry="12" fill="#38bdf8"/>
+
+  <!-- Tres puntos horizontales (típico de BD) -->
+  <circle cx="65" cy="110" r="2" fill="#e0f2fe"/>
+  <circle cx="80" cy="110" r="2" fill="#e0f2fe"/>
+  <circle cx="95" cy="110" r="2" fill="#e0f2fe"/>
+
+  <!-- ========================================== -->
+  <!-- PLANTA (Crecimiento/Agricultura)           -->
+  <!-- ========================================== -->
+  <!-- Tallo central -->
+  <path d="M80 85 Q 85 60 80 40" fill="none" stroke="#22c55e" stroke-width="4" stroke-linecap="round"/>
+  <!-- Hoja izquierda -->
+  <path d="M80 75 Q 40 60 60 30 Q 80 50 80 75 Z" fill="#4ade80" stroke="#22c55e" stroke-width="1"/>
+  <!-- Hoja derecha -->
+  <path d="M80 65 Q 120 40 95 20 Q 85 45 80 65 Z" fill="#22c55e" />
+
+  <!-- ========================================== -->
+  <!-- TEXTO Y TIPOGRAFÍA                         -->
+  <!-- ========================================== -->
+  <text x="170" y="90" font-family="Arial, Helvetica, sans-serif" font-size="76" font-weight="bold" fill="#665345" letter-spacing="-1">Farm</text>
+  <text x="375" y="90" font-family="Arial, Helvetica, sans-serif" font-size="76" font-weight="bold" fill="#2098d1" letter-spacing="-1">IA</text>
+
+  <!-- Línea separadora -->
+  <line x1="170" y1="110" x2="570" y2="110" stroke="#b6957a" stroke-width="5" stroke-linecap="round"/>
+
+  <!-- Subtítulo -->
+  <text x="170" y="135" font-family="Arial, Helvetica, sans-serif" font-size="19" fill="#7ba05b" letter-spacing="0.5">agricultura inteligente basada en datos</text>
+</svg>

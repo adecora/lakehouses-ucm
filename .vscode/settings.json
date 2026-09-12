@@ -37,9 +37,20 @@
         "editor.formatOnSave": true,
     },
 
-    // General settings
-    "[json]": {
-      "editor.insertSpaces": true,
-      "editor.tabSize": 2
-    }
+    // Setting para la extensión de corrección ortográfica y generación de PDFs desde Markdown
+    "cSpell.language": "es",
+    "markdown.extension.toc.levels": "1..3",
+    "markdown-pdf.displayHeaderFooter": true,
+    "markdown-pdf.printBackground": true,
+    "markdown-pdf.format": "A4",
+    "markdown-pdf.margin.top": "1.2cm",
+    "markdown-pdf.margin.bottom": "1.2cm",
+    "markdown-pdf.margin.right": "1.5cm",
+    "markdown-pdf.margin.left": "1.5cm",
+    "markdown-pdf.mermaidServer": "https://cdn.jsdelivr.net/npm/mermaid@11.14.0/dist/mermaid.min.js",
+    "markdown-pdf.headerTemplate": "<div></div>",
+    "markdown-pdf.footerTemplate": "<div style=\"font-size: 9px; width: 100%; display: flex; justify-content: space-between; padding: 0 20px;\"><span class='pageNumber'></span><span>Alejandro de Cora</span></div>",
+    "markdown-pdf.highlight": true,
+    // Ahora la extensión yzane.markdown-pdf escapa HTML peligroso <style>, <script> e <iframe> dentro del cuerpo de markdown v.2.1.0
+    "markdown-pdf.styles": ["assets/pdf.css"],
 }

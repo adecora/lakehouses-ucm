@@ -69,45 +69,23 @@ with this project. It's also possible to interact with it directly using the CLI
    $ uv run pytest
    ```
 
+---
+[@title]: #
+[Source - https://stackoverflow.com/a/35760941]: #
+[Posted by Harmon, modified by community. See post 'Timeline' for change history]: #
+[Retrieved 2026-02-26, License - CC BY-SA 4.0]: #
 
-
-```
-IngestionConfig
-│
-├── datasource
-├── dataset
-│
-├── source
-│   │
-│   ├── FileSourceConfig
-│   │   ├── format
-│   │   ├── path
-│   │   ├── schema
-│   │   ├── schema_location
-│   │   ├── schema_evolution_mode
-│   │   ├── schema_hints
-│   │   └── options
-│   │
-│   └── KafkaSourceConfig
-│       ├── connection
-│       │   ├── bootstrap_servers
-│       │   ├── security_protocol
-│       │   ├── sasl_mechanism
-│       │   ├── username
-│       │   └── password
-│       ├── subscribe / subscribe_pattern
-│       ├── key_format
-│       ├── value_format
-│       ├── key_subject
-│       ├── value_subject
-│       ├── schema
-│       ├── schema_location
-│       ├── schema_evolution_mode
-│       ├── schema_hints
-│       └── options
-│
-└── sink
-    ├── path / table
-    ├── checkpoint_location
-    └── partition_columns
-```
+<footer style="width:100%; display:flex; justify-content:center; margin:3rem 0;">
+    <p align="center">
+      <a href="https://alejandrodecora.es/es" style="width:100%; display:flex; justify-content:center; text-decoration: none;">
+          Hecho con 💜 por
+          <!-- prettier-ignore -->
+          <svg viewBox="0 0 600 530" version="1.1" xmlns="http://www.w3.org/2000/svg" style="position: relative; top: 4px; height: 1.25em;">
+          <path
+            d="m135.72 44.03c66.496 49.921 138.02 151.14 164.28 205.46 26.262-54.316 97.782-155.54 164.28-205.46 47.98-36.021 125.72-63.892 125.72 24.795 0 17.712-10.155 148.79-16.111 170.07-20.703 73.984-96.144 92.854-163.25 81.433 117.3 19.964 147.14 86.092 82.697 152.22-122.39 125.59-175.91-31.511-189.63-71.766-2.514-7.3797-3.6904-10.832-3.7077-7.8964-0.0174-2.9357-1.1937 0.51669-3.7077 7.8964-13.714 40.255-67.233 197.36-189.63 71.766-64.444-66.128-34.605-132.26 82.697-152.22-67.108 11.421-142.55-7.4491-163.25-81.433-5.9562-21.282-16.111-152.36-16.111-170.07 0-88.687 77.742-60.816 125.72-24.795z"
+            fill="#1185fe" />
+          </svg>
+          <code>@vichelocrego</code>
+      </a>
+    </p>
+</footer>
