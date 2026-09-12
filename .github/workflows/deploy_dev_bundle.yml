@@ -1,0 +1,90 @@
+# Ver: https://learn.microsoft.com/en-us/azure/databricks/dev-tools/ci-cd/github
+name: Flujo CI/CD para MotorIngesta
+
+on:
+  # pull_request:
+  #   branches:
+  #     - main
+  # push:
+  #   branches:
+  #     - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+
+      - name: Install dependencies
+        run: uv sync --locked --dev
+
+      - name: Run tests with coverage
+        run: uv run pytest --cov=motor_ingesta --cov-report=term --cov-branch --cov-report=xml
+
+  validate:
+    needs: test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Databricks CLI Setup
+        uses: databricks/setup-cli@v0.9.0
+
+      - name: Validate bundle
+        env:
+          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+        run: databricks bundle validate --target dev
+
+  deploy:
+    needs: validate
+    # if: github.event_name == 'push' && github.ref == 'refs/heads/main' # Only deploy on push to main
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Databricks CLI Setup
+        uses: databricks/setup-cli@v0.9.0
+
+      - name: Deploy bundle
+        env:
+          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+        run: databricks bundle deploy --target dev
+
+  run-job:
+    needs: deploy
+    # if: github.event_name == 'push' && github.ref == 'refs/heads/main' # Only deploy on push to main
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Databricks CLI Setup
+        uses: databricks/setup-cli@v0.9.0
+
+      - name: Run lakehouses_ucm
+        run: databricks bundle run --target dev lakehouses_ucm
+        working-directory: .
+        env:
+          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
