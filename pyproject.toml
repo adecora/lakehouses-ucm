@@ -23,6 +23,7 @@ dev = [
     "databricks-dlt",
     "databricks-connect~=17.3.0",
     "ipykernel",
+    "pytest-cov>=7.1.0",
 ]
 
 [project.scripts]
@@ -256,3 +257,11 @@ constraint-dependencies = [
     "zipp~=3.21.0",
 ]
 # end managed by databricks environments setup-local
+
+[tool.pytest.ini_options]
+filterwarnings = [
+    "ignore:The 'warn' method is deprecated:DeprecationWarning:pyspark.logger.logger",
+]
+testpaths = "tests"
+pythonpath = "src"
+addopts = "--verbose --cov=motor_ingesta --cov-report html"

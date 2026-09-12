@@ -1,0 +1,42 @@
+[
+    {
+        "source": {
+            "format": "json",
+            "options": {
+            },
+            "schema": "event_id string, event_ts string, session_id string, customer_id string, event_type string, product_id string, channel string",
+            "schemaEvolutionMode": "rescue",
+            "path": "app_events_??.json"
+        },
+        "sink": {
+            "name": "events_raw",
+            "trigger": {
+                "type": "availableNow",
+                "value": "True"
+            },
+            "partition": {
+                "type": "year_month"
+            }
+        }
+    },
+    {
+        "source": {
+            "format": "parquet",
+            "options": {
+            },
+            "schema_location": "True",
+            "schemaEvolutionMode": "addNewColumns",
+            "path": "orders_cdc_??.parquet"
+        },
+        "sink": {
+            "name": "orders_raw",
+            "trigger": {
+                "type": "once",
+                "value": "True"
+            },
+            "partition": {
+                "type": "year_month"
+            }
+        }
+    }
+]
