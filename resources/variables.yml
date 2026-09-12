@@ -22,4 +22,4 @@ variables:
     default: abfss://lakehouse@masteravdc001sta.dfs.core.windows.net/farmia/bronze
   config_dir:
     description: Ruta del archivo de configuración de ingesta (JSON)
-    default: ../config.json
+    default: /Workspace/Users/alvare05@ucm.es/.bundle/lakehouses_ucm/dev/files/config.json

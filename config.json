@@ -13,6 +13,9 @@
             "trigger": {
                 "type": "availableNow",
                 "value": "True"
+            },
+            "partition": {
+                "type": "year_month"
             }
         }
     },
@@ -30,6 +33,9 @@
             "trigger": {
                 "type": "once",
                 "value": "True"
+            },
+            "partition": {
+                "type": "year_month"
             }
         }
     }

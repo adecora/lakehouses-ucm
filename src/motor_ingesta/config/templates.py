@@ -192,6 +192,32 @@ class StrTrigger(BaseConfig):
 Trigger = Annotated[BoolTrigger | StrTrigger, Field(discriminator="type")]
 
 
+class Partition(BaseConfig):
+    """
+    Esquema para la configuración de particionamiento.
+    Permite definir la columna por la cual se particionará la tabla y tres niveles de particionamiento.
+    Los tipos de particionamiento soportados son:
+        - "column": particionamiento por una columna específica.
+        - "year": particionamiento por año basado en la columna "_ingested_at".
+        - "year_month": particionamiento por año y mes basado en la columna "_ingested_at".
+    """
+
+    column: str | None = None
+    type: Literal["column", "year", "year_month"]
+
+    @model_validator(mode="after")
+    def validate_partition(self):
+        """
+        Valida que solo se haya especificado la columna cuando el tipo de particionamiento sea "column".
+        """
+        if self.column is not None and self.type in ("year", "year_month"):
+            raise ValueError("La columna solo debe especificarse cuando el tipo de particionamiento sea 'column'.")
+        if self.column is None and self.type == "column":
+            raise ValueError("Se debe especificar la columna cuando el tipo de particionamiento sea 'column'.")
+
+        return self
+
+
 class SinkConfig(BaseConfig):
     """
     Esquema para la configuración del sink de bronze.
@@ -200,6 +226,7 @@ class SinkConfig(BaseConfig):
 
     name: str
     trigger: Trigger | None = None
+    partition: Partition | None = None
 
     @computed_field
     @property

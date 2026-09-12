@@ -1,4 +1,3 @@
-import json
 from collections.abc import Callable
 
 from databricks.sdk.runtime import spark
@@ -8,7 +7,7 @@ from pyspark.sql.avro.functions import from_avro
 from pyspark.sql.streaming import StreamingQuery
 
 from .config import IngestConfig
-from .config.templates import FileSourceConfig, KafkaSourceConfig, SinkConfig
+from .config.templates import FileSourceConfig, KafkaSourceConfig, Partition, SinkConfig
 
 
 class MotorIngesta:
@@ -69,6 +68,8 @@ class MotorIngesta:
                 df = df.withColumn("value", F.col("value").cast("string"))
             elif source.messages == "avro":
                 parser = from_avro
+            else:
+                raise ValueError(f'Formato de mensaje no soportado: "{source.messages}"')
 
             # Renombramos las columnas
             columns = [F.col(c).alias(f"_{c}") for c in df.columns]
@@ -125,6 +126,20 @@ class MotorIngesta:
 
         return reader.load().transform(parse_stream)
 
+    def __partitionBy(self, df: DataFrame, partition: Partition) -> tuple[DataFrame, str]:
+        if partition.type == "column":
+            return df, partition.column
+
+        # Para particiones basadas en año y año-mes se usa la columna "_ingested_at" para determinar la partición
+        elif partition.type == "year":
+            df = df.withColumn("_ingested_year", F.year(F.col("_ingested_at")))
+            return df, "_ingested_year"
+        elif partition.type == "year_month":
+            df = df.withColumn("_ingested_year_month", F.date_format("_ingested_at", "yyyy-MM"))
+            return df, "_ingested_year_month"
+        else:
+            raise ValueError(f'Tipo de particionamiento no soportado: "{partition.type}"')
+
     def __write_stream(self, df: DataFrame, sink: SinkConfig, *, trigger: dict | None = None) -> StreamingQuery:
         """
         Escribe un DataFrame en un sink de bronze.
@@ -141,9 +156,17 @@ class MotorIngesta:
         if sink.trigger is not None:
             trigger = sink.trigger_config
 
-        writer = df.writeStream.option("queryName", table_name).option(
-            "checkpointLocation", f"{self.checkpoints_location}/{table_name}"
-        )
+        if sink.partition is not None:
+            df, partition_column = self.__partitionBy(df, sink.partition)
+            writer = (
+                df.writeStream.option("queryName", table_name)
+                .option("checkpointLocation", f"{self.checkpoints_location}/{table_name}")
+                .partitionBy(partition_column)
+            )
+        else:
+            writer = df.writeStream.option("queryName", table_name).option(
+                "checkpointLocation", f"{self.checkpoints_location}/{table_name}"
+            )
         if self.tables_location:
             writer = writer.option("path", f"{self.tables_location}/{table_name}")
 
@@ -172,6 +195,6 @@ class MotorIngesta:
                 query = self.__write_stream(df, sink, trigger={"availableNow": True})
                 queries.append(query)
             else:
-                raise Exception(f'El formato "{format}" no está soportado!')
+                raise ValueError(f'El formato "{source.format}" no está soportado!')
 
         return queries
