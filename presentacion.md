@@ -15,7 +15,7 @@
 
 # Notas <!-- omit in toc -->
 
-- El código completo del trabajo se encuentra alojado en el repositorio: [https://github.com/adecora/bbdd-nosql](https://github.com/adecora/bbdd-nosql).
+- El código completo del trabajo se encuentra alojado en el repositorio: [https://github.com/adecora/lakehouses-ucm](https://github.com/adecora/lakehouses-ucm).
 - Fuentes utilizadas:
   - El material de la asignatura **Diseño de ingestas y data lakehouses**.
   - [Documentación de **Azure Databricks**](https://learn.microsoft.com/en-us/azure/databricks/).
